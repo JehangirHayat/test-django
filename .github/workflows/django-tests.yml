@@ -34,9 +34,9 @@ jobs:
         run: mkdir -p results
 
       # 5. Ejecutar pytest y guardar toda la salida
-- name: Run pytest and save results
-  working-directory: AA_Energies
-  run: pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1
+      - name: Run pytest and save results
+        working-directory: AA_Energies
+        run: pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1
 
 
       # 6. Subir resultados como artifact
