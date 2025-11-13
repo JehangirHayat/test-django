@@ -1,0 +1,71 @@
+{% load i18n %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const meses = [
+        "{% trans 'Enero' %}","{% trans 'Febrero' %}","{% trans 'Marzo' %}","{% trans 'Abril' %}",
+        "{% trans 'Mayo' %}","{% trans 'Junio' %}","{% trans 'Julio' %}","{% trans 'Agosto' %}",
+        "{% trans 'Septiembre' %}","{% trans 'Octubre' %}","{% trans 'Noviembre' %}","{% trans 'Diciembre' %}"
+    ];
+
+    // ============================
+    // DATOS Y LÍMITE DE POTENCIA
+    // ============================
+    const limitePotencia = 80;  
+    const datosPotencia = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+
+    // ============================
+    // ENVIAR NOTIFICACIONES DE POTENCIA
+    // ============================
+    if(window.notificationsManager) {
+        datosPotencia.forEach((valor,index) => {
+            if(valor > limitePotencia) {
+                window.notificationsManager.addNotification({
+                    id: Date.now() + Math.random() * 1000 + index,
+                    type: 'warning',
+                    icon: 'fa-exclamation-triangle',
+                    title: "{% trans 'Alerta de Potencia' %}",
+                    message: `{% trans 'La potencia en' %} ${meses[index]} (${valor} kW) {% trans 'supera el límite de' %} ${limitePotencia} kW.`,
+                    time: "{% trans 'Ahora' %}",
+                    unread: true
+                });
+            }
+        });
+    }
+
+    // ============================
+    // CREAR GRÁFICO DE POTENCIA
+    // ============================
+    const canvas = document.getElementById('potenciaChartContainer');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: meses,
+                datasets: [{
+                    label: "{% trans 'Potencia (kW)' %}",
+                    data: datosPotencia,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display:true, labels:{ color:'#6366f1' } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero:true,
+                        ticks: { color:'#6366f1' },
+                        grid: { color:'rgba(99,102,241,0.1)' }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>

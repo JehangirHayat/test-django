@@ -1,0 +1,114 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% trans "Login" %} — PakEnergix</title>
+
+  <!-- CSS & Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap">
+
+  <!-- Login & Settings CSS -->
+  <link id="ajustesStylesheet" rel="stylesheet" href="{% static 'css/Dark/Settings_dark.css' %}">
+  <link id="loginStylesheet" rel="stylesheet" href="{% static 'css/Dark/Login_dark.css' %}">
+  
+</head>
+<body class="dark-mode">
+
+  <!-- Settings Toggle Button -->
+  <button id="settingsToggle" class="settings-toggle btn btn-light position-fixed top-0 end-0 m-3" 
+          aria-label="{% trans 'Abrir Ajustes' %}">
+    <i class="fa fa-cog"></i>
+  </button>
+
+  <!-- Login Card -->
+  <main class="login-wrapper d-flex justify-content-center align-items-center min-vh-100">
+    <section class="login-card card p-4" role="form" aria-label="{% trans 'Formulario de Login' %}">
+      
+      <!-- Logo Section -->
+      <div class="logo-container">
+        <img src="{% static 'img/logo.png' %}" alt="PakEnergix Logo">
+      </div>
+      
+      <header class="text-center mb-4">
+        <h1 class="login-title">{% trans "Iniciar Sesión" %}</h1>
+        <p class="login-subtitle">{% trans "Accede a tu cuenta de forma segura" %}</p>
+      </header>
+
+      <div id="alertMessage" class="alert-message" role="alert"></div>
+
+      <form class="login-form" autocomplete="on" id="loginForm">
+        {% csrf_token %}
+        
+        <!-- Username -->
+        <div class="mb-3">
+          <label for="username" class="form-label">{% trans "Usuario" %}</label>
+          <div class="input-box input-group">
+            <span class="input-group-text"><i class="fa fa-user"></i></span>
+            <input type="text" id="username" name="username" class="form-control" 
+                   placeholder="{% trans 'Ingresa tu usuario' %}" required aria-required="true">
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label">{% trans "Contraseña" %}</label>
+          <div class="input-box input-group">
+            <span class="input-group-text"><i class="fa fa-lock"></i></span>
+            <input type="password" id="password" name="password" class="form-control" 
+                  placeholder="{% trans 'Ingresa tu contraseña' %}" required aria-required="true">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-login btn btn-primary w-100">{% trans "Ingresar" %}</button>
+      </form>
+
+    </section>
+  </main>
+
+  <!-- Settings Popup -->
+  <div class="settings-popup" id="settingsPopup" aria-modal="true" role="dialog">
+    <div class="settings-wrapper">
+      <button class="close-popup" id="closePopup" aria-label="{% trans 'Cerrar Ajustes' %}">&times;</button>
+      <h2>⚙️ {% trans "Ajustes" %}</h2>
+
+      <!-- Language Selection -->
+      <section class="settings-section">
+        <h3>{% trans "Idioma" %}</h3>
+        <div class="lang-select">
+<a class="lang-btn" href="/en/" role="button" data-lang="en">En</a>
+<a class="lang-btn" href="/es/" role="button" data-lang="es">Es</a>
+<a class="lang-btn" href="/eu/" role="button" data-lang="eu">Eu</a>
+        </div>
+      </section>
+
+      <!-- Theme Toggle -->
+      <section class="settings-section">
+        <h3>{% trans "Tema" %}</h3>
+        <div class="toggle-wrapper d-flex justify-content-between align-items-center">
+          <i class="fa fa-moon" aria-hidden="true"></i>
+          <label class="switch mb-0">
+            <input type="checkbox" id="themeToggle" aria-label="{% trans 'Activar tema oscuro' %}">
+            <span class="slider"></span>
+          </label>
+          <i class="fa fa-sun" aria-hidden="true"></i>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Pasar idioma actual a JavaScript -->
+<script>
+  // Pasar idioma actual de Django a JS
+  window.CURRENT_LANGUAGE = "{{ LANGUAGE_CODE }}";
+  window.CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+  
+  <script type="module" src="{% static 'js/login.js' %}"></script>
+</body>
+</html>

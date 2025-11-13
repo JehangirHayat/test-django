@@ -1,0 +1,74 @@
+@import url('colors-dark.css');
+
+/* ===============================
+   NOTIFICATIONS STYLES
+=============================== */
+.notif-btn { position: relative; }
+
+.notif-dot {
+  width: 8px; height: 8px; background: var(--error);
+  border-radius: 50%; position: absolute; top: 10px; right: 10px;
+  box-shadow: 0 0 0 2px var(--card-bg); animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.8; transform:scale(1.15); }
+}
+
+.notifications-panel {
+  position: fixed; top: 80px; right: 2rem; width: 420px; max-height:600px;
+  background: var(--card-bg); border:1px solid var(--border-light);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+  overflow: hidden; z-index:1000; animation: slideInRight 0.3s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes slideInRight { from {opacity:0; transform:translateX(30px);} to {opacity:1; transform:translateX(0);} }
+
+.notifications-header {
+  padding:1.25rem 1.5rem; background: var(--gradient);
+  border-bottom:1px solid var(--border-light);
+  display:flex; justify-content:space-between; align-items:center;
+}
+
+.notifications-header h3 { font-size:1.1rem; font-weight:600; color:white; margin:0; }
+
+.btn-mark-read {
+  background: rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3);
+  color:white; padding:0.4rem 0.8rem; border-radius:var(--radius-sm);
+  font-size:0.8rem; cursor:pointer; transition:var(--transition);
+}
+
+.btn-mark-read:hover { background: rgba(255,255,255,0.3); transform:translateY(-1px); }
+
+.notifications-body {
+  max-height:520px; overflow-y:auto; padding:0.5rem;
+}
+
+.notification-item {
+  padding:1rem 1.25rem; margin:0.5rem 0;
+  background:var(--bg-secondary); border:1px solid var(--border);
+  border-radius:var(--radius); cursor:pointer; transition:var(--transition);
+  position:relative;
+}
+
+.notification-item:hover { background:var(--card-bg-hover); border-color:var(--accent-1); transform:translateX(5px); }
+.notification-item.unread { border-left:3px solid var(--accent-1); background:rgba(99,102,241,0.05); }
+
+.notification-item.unread::before {
+  content:''; position:absolute; top:1rem; right:1rem; width:8px; height:8px;
+  background:var(--accent-1); border-radius:50%; box-shadow:0 0 8px var(--accent-1);
+}
+
+.notification-title { font-size:0.95rem; font-weight:600; color:var(--text); margin-bottom:0.25rem; }
+.notification-message { font-size:0.85rem; color:var(--text-muted); line-height:1.5; margin-bottom:0.5rem; }
+.notification-time { font-size:0.75rem; color:var(--text-dim); display:flex; align-items:center; gap:0.35rem; }
+
+.notification-empty { padding:3rem 2rem; text-align:center; color:var(--text-muted); }
+.notification-empty i { font-size:3rem; margin-bottom:1rem; opacity:0.5; }
+.notification-empty p { font-size:0.95rem; }
+
+/* RESPONSIVE */
+@media (max-width:1024px) { .notifications-panel { width:360px; right:1rem; } }
+@media (max-width:768px)  { .notifications-panel { width:calc(100vw - 2rem); right:1rem; left:1rem; max-height:500px; } }

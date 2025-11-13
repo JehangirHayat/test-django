@@ -1,0 +1,297 @@
+  {% load static i18n %}
+  <!DOCTYPE html>
+  <html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{% block title %}{% trans "Panel Energético — PakEnergix" %}{% endblock %}</title>
+
+    <!-- Fonts e Iconos -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS personalizados -->
+    <link rel="stylesheet" href="{% static 'css/Light/Dashboard_light.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Light/Dashboard_settings_light.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Dark/notifications_dark.css' %}">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body class="d-flex flex-column min-vh-100 app">
+
+    <!-- HEADER -->
+    <header class="header" role="banner">
+      <div class="header__left">
+        <a href="{% url 'dashboard' %}" class="logo" aria-label="{% trans 'PakEnergix - Inicio' %}">
+          <img id="dashboardLogo" src="{% static 'img/logo-dark.png' %}" alt="{% trans 'App Logo' %}">
+        </a>
+      </div>
+      <div class="header__right" role="navigation">
+        <button class="icon-btn notif-btn" id="btnNotifications" aria-label="{% trans 'Notificaciones' %}" title="{% trans 'Notificaciones' %}">
+          <span class="notif-dot"></span>
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <button id="btnAjustes" class="icon-btn" title="{% trans 'Ajustes' %}" aria-controls="dashboardSettingsPopup" aria-haspopup="dialog">
+          <i class="fa-solid fa-gears"></i>
+        </button>
+        <button id="btnLogout" class="icon-btn" title="{% trans 'Cerrar sesión' %}">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- NOTIFICATIONS PANEL -->
+    <div id="notificationsPanel" class="notifications-panel" style="display: none;">
+      <div class="notifications-header">
+        <h3><i class="fa-solid fa-bell"></i> {% trans "Notificaciones" %}</h3>
+        <button class="btn-mark-read" id="btnMarkAllRead">
+          <i class="fa-solid fa-check-double"></i> {% trans "Marcar todo como leído" %}
+        </button>
+      </div>
+      <div class="notifications-body" id="notificationsList">
+        <!-- Notifications will be inserted here dynamically -->
+      </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow-1 layout" role="main">
+      <!-- FILTROS -->
+      <div class="controls">
+        <button id="btnFiltro" class="btn btn--primary" aria-expanded="false" aria-controls="filter-options">
+          <i class="fa-solid fa-filter"></i> {% trans "Filtros" %}
+        </button>
+
+        <div id="filter-options" class="filters" style="display:none;">
+          <select id="period-select" class="input">
+            <option value="">{% trans "Seleccionar..." %}</option>
+            <option value="dia">{% trans "Día" %}</option>
+            <option value="semana">{% trans "Semana" %}</option>
+            <option value="mes">{% trans "Mes" %}</option>
+            <option value="año">{% trans "Año" %}</option>
+            <option value="otro">{% trans "Otro" %}</option>
+          </select>
+
+          <input id="date-picker" class="input input--date" type="date" style="display:none;">
+          <input id="date-picker-start" class="input input--date" type="date" style="display:none;">
+          <input id="date-picker-end" class="input input--date" type="date" style="display:none;">
+          <select id="month-picker" class="input" style="display:none;">
+            <option value="">{% trans "Seleccionar mes..." %}</option>
+            <option value="1">{% trans "Enero" %}</option>
+            <option value="2">{% trans "Febrero" %}</option>
+            <option value="3">{% trans "Marzo" %}</option>
+            <option value="4">{% trans "Abril" %}</option>
+            <option value="5">{% trans "Mayo" %}</option>
+            <option value="6">{% trans "Junio" %}</option>
+            <option value="7">{% trans "Julio" %}</option>
+            <option value="8">{% trans "Agosto" %}</option>
+            <option value="9">{% trans "Septiembre" %}</option>
+            <option value="10">{% trans "Octubre" %}</option>
+            <option value="11">{% trans "Noviembre" %}</option>
+            <option value="12">{% trans "Diciembre" %}</option>
+          </select>
+          <select id="year-picker" class="input" style="display:none;">
+            <option value="">{% trans "Seleccionar año..." %}</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+          <select id="season-select" class="input" style="display:none;">
+            <option value="">{% trans "Temporada..." %}</option>
+            <option value="verano">{% trans "Verano" %}</option>
+            <option value="invierno">{% trans "Invierno" %}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- GRID PRINCIPAL -->
+      <div class="dashboard-grid container-fluid px-4">
+        <div class="row g-4">
+          <!-- ENERGIA -->
+          <div class="col-lg-4 col-md-6">
+            <section class="card card--chart h-100">
+              <h2 class="card__title">
+                <i class="fa-solid fa-bolt"></i> {% trans "Energía / kW" %}
+              </h2>
+              <div class="card__body">
+                <canvas id="energiaChartContainer"></canvas>
+              </div>
+            </section>
+          </div>
+
+          <!-- POTENCIA -->
+          <div class="col-lg-4 col-md-6">
+            <section class="card card--chart h-100">
+              <h2 class="card__title">
+                <i class="fa-solid fa-gauge-high"></i> {% trans "Potencia / kW" %}
+              </h2>
+              <div class="card__body">
+                <canvas id="potenciaChartContainer"></canvas>
+              </div>
+            </section>
+          </div>
+
+          <!-- EXPORT / IMPORT / HISTORY -->
+          <div class="col-lg-4 col-md-12" id="adminStatsSection" style="display: none;">
+            <section class="card card--info h-100">
+              <h2 class="card__title">
+                <i class="fa-solid fa-chart-line"></i> {% trans "Export / Import / History" %}
+              </h2>
+              <div class="card__body card__body--stats">
+                <div class="stat-item">
+                  <div class="stat-icon stat-icon--success">
+                    <i class="fa-solid fa-arrow-up"></i>
+                  </div>
+                  <div class="stat-content">
+                    <span class="stat-label">{% trans "Export" %}</span>
+                    <span class="stat-value">1,245 kW</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon stat-icon--warning">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </div>
+                  <div class="stat-content">
+                    <span class="stat-label">{% trans "Import" %}</span>
+                    <span class="stat-value">890 kW</span>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-icon stat-icon--info">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </div>
+                  <div class="stat-content">
+                    <span class="stat-label">{% trans "Historical" %}</span>
+                    <span class="stat-value">Ver datos</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- FILA INFERIOR -->
+        <div class="row g-4 mt-4">
+          <div class="col-md-6">
+            <article class="card card--info h-100" id="datosConstantesContainer">
+              <h2 class="card__title">
+                <i class="fa-solid fa-database"></i> {% trans "Datos Constantes" %}
+              </h2>
+              <div class="card__body">
+                {% include 'DatosConstantes.html' %}
+              </div>
+            </article>
+          </div>
+          <div class="col-md-6">
+            <article class="card card--info h-100" id="datosDinamicosContainer">
+              <h2 class="card__title">
+                <i class="fa-solid fa-chart-simple"></i> {% trans "Datos Dinámicos" %}
+              </h2>
+              <div class="card__body">
+                {% include 'DatosDinamicos.html' %}
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer mt-auto text-center py-3">
+      <p>© 2025 PakEnergix</p>
+    </footer>
+
+    <!-- SETTINGS POPUP -->
+    <div id="dashboardSettingsPopup" class="modal-popup" aria-modal="true" role="dialog" aria-labelledby="settings-title">
+      <div class="modal-popup__content">
+        <button class="modal-popup__close" id="closeDashboardSettings" aria-label="{% trans 'Cerrar configuración' %}" type="button">&times;</button>
+        <h2 id="settings-title"><i class="fa-solid fa-gears"></i> {% trans "Ajustes del Panel" %}</h2>
+
+        <section class="settings-section" aria-labelledby="language-heading">
+          <h3 id="language-heading"><i class="fa-solid fa-language"></i> {% trans "Idioma" %}</h3>
+          <div class="lang-select" role="group" aria-label="{% trans 'Selección de idioma' %}">
+            <a class="lang-btn" href="/en/" role="button" data-lang="en">
+              En
+            </a>
+            <a class="lang-btn" href="/es/" role="button" data-lang="es">
+              Es
+            </a>
+            <a class="lang-btn" href="/eu/" role="button" data-lang="eu">
+              Eu
+            </a>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="theme-heading">
+          <h3 id="theme-heading"><i class="fa-solid fa-palette"></i> {% trans "Tema" %}</h3>
+          <div class="toggle-wrapper">
+            <i class="fa fa-moon" title="{% trans 'Modo Oscuro' %}"></i>
+            <label class="switch" for="dashboardThemeToggle">
+              <input type="checkbox" id="dashboardThemeToggle" role="switch" aria-checked="false">
+              <span class="slider"></span>
+            </label>
+            <i class="fa fa-sun" title="{% trans 'Modo Claro' %}"></i>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="data-heading">
+          <h3 id="data-heading"><i class="fa-solid fa-file-import"></i> {% trans "Gestión de Datos" %}</h3>
+          {% csrf_token %}
+          <div class="file-row">
+            <div class="file-label-container">
+              <span class="file-label"><i class="fa fa-upload"></i> {% trans "Importar Datos" %}</span>
+              <span id="importFileName" class="file-info">{% trans "Ningún archivo seleccionado" %}</span>
+            </div>
+            <div class="file-actions">
+              <input type="file" id="importFileInput" accept=".xlsx,.csv,.json" style="display:none;">
+              <button id="btnSelectImport" class="btn btn--outline" type="button">
+                <i class="fa fa-folder-open"></i> {% trans "Seleccionar" %}
+              </button>
+              <button id="btnImport" class="btn btn--primary" type="button" disabled>
+                <i class="fa fa-file-import"></i> {% trans "Importar" %}
+              </button>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div class="file-label-container">
+              <span class="file-label"><i class="fa fa-download"></i> {% trans "Exportar Datos" %}</span>
+              <span id="exportFileName" class="file-info">{% trans "Listo para exportar" %}</span>
+            </div>
+            <div class="file-actions">
+              <select id="exportFormat" class="btn btn--outline">
+                <option value="">{% trans "Formato..." %}</option>
+                <option value="json">JSON</option>
+                <option value="csv">CSV</option>
+                <option value="xlsx">{% trans "Excel" %}</option>
+              </select>
+              <button id="btnExport" class="btn btn--secondary" type="button">
+                <i class="fa fa-file-export"></i> {% trans "Exportar" %}
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Pasar idioma actual a JavaScript -->
+    <script>
+      window.CURRENT_LANGUAGE = "{{ LANGUAGE_CODE }}";
+      window.CSRF_TOKEN = "{{ csrf_token }}";
+    </script>
+
+    <!-- SCRIPTS -->
+    <script src="{% static 'js/notifications.js' %}" defer></script>
+    <script src="{% static 'js/dashboard_settings.js' %}" defer></script>
+    <script src="{% static 'js/dashboard.js' %}" defer></script>
+    <script src="{% static 'js/graficos.js' %}" defer></script>
+    <script src="{% static 'js/utils.js' %}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+  </html>

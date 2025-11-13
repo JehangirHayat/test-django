@@ -1,0 +1,62 @@
+{% load i18n %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const meses = [
+        "{% trans 'Enero' %}","{% trans 'Febrero' %}","{% trans 'Marzo' %}","{% trans 'Abril' %}",
+        "{% trans 'Mayo' %}","{% trans 'Junio' %}","{% trans 'Julio' %}","{% trans 'Agosto' %}",
+        "{% trans 'Septiembre' %}","{% trans 'Octubre' %}","{% trans 'Noviembre' %}","{% trans 'Diciembre' %}"
+    ];
+
+    const limite = 80;  // Límite para generar notificación
+
+    const canvas = document.getElementById('energiaChartContainer');
+    if (canvas) {
+        const energia = canvas.getContext('2d');
+
+        const datosEnergia = [10,20,30,40,50,60,70,80,90,100,110,120];
+
+        // Verificar si algún valor supera el límite
+        datosEnergia.forEach((valor, index) => {
+            if (valor > limite && window.notificationsManager) {
+                window.notificationsManager.addNotification({
+                    id: Date.now() + index,
+                    type: 'warning',
+                    icon: 'fa-exclamation-triangle',
+                    title: "{% trans 'Alerta de Consumo' %}",
+                    message: `{% trans 'La energía en' %} ${meses[index]} ${valor} kW supera el límite de ${limite} kW.`,
+                    time: "{% trans 'Ahora' %}",
+                    unread: true
+                });
+            }
+        });
+
+        new Chart(energia, {
+            type: 'bar',
+            data: {
+                labels: meses,
+                datasets: [{
+                    label: "{% trans 'Energía (kW)' %}",
+                    data: datosEnergia,
+                    backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                    borderColor: '#6366f1',
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: { color: '#6366f1' }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: '#6366f1' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                    y: { beginAtZero:true, ticks:{ color:'#6366f1' }, grid:{ color:'rgba(255,255,255,0.1)' } }
+                }
+            }
+        });
+    }
+});
+</script>
