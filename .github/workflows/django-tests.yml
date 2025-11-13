@@ -13,29 +13,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repository
+      # 1. Checkout del repositorio
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Set up Python
+      # 2. Configurar Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # 3. Install dependencies
+      # 3. Instalar dependencias
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r AA_Energies/requirements.txt
 
-      # 4. Run Django tests and save output
-      - name: Run Django tests and save results
+      # 4. Crear base de datos SQLite para tests
+      - name: Prepare Django environment
         run: |
-          mkdir -p results
-          python manage.py test AAEnergiesApp.tests --verbosity=2 2>&1 | tee results/results..txt
+          python manage.py migrate
 
-      # 5. Upload test results as artifact
+      # 5. Crear carpeta de resultados
+      - name: Create results folder
+        run: mkdir -p results
+
+      # 6. Ejecutar tests y guardar toda la salida
+      - name: Run Django tests and save results
+        run: python manage.py test AAEnergiesApp.tests --verbosity=2 > results/results..txt 2>&1
+
+      # 7. Subir resultados como artifact
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
