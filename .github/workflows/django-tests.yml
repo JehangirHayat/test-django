@@ -32,12 +32,12 @@ jobs:
       # 4. Run Django tests and save output
       - name: Run Django tests and save results
         run: |
-          mkdir -p $HOME/test-results
-          python manage.py test AAEnergiesApp.tests --verbosity=2 2>&1 | tee $HOME/test-results/results.txt
+          mkdir -p results
+          python manage.py test AAEnergiesApp.tests --verbosity=2 2>&1 | tee results/results..txt
 
       # 5. Upload test results as artifact
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
           name: django-test-results
-          path: $HOME/test-results/results.txt
+          path: results/results..txt
