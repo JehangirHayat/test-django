@@ -1,4 +1,4 @@
-name: Django Tests
+name: Django Pytest
 
 on:
   push:
@@ -33,16 +33,15 @@ jobs:
       - name: Create results folder
         run: mkdir -p results
 
-      # 5. Ejecutar migrations y tests desde el directorio correcto
-      - name: Run Django tests and save results
+      # 5. Ejecutar pytest y guardar toda la salida
+      - name: Run pytest and save results
         run: |
           cd AA_Energies
-          python manage.py migrate
-          python manage.py test AAEnergiesApp.tests --verbosity=2 > ../results/results..txt 2>&1
+          pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1
 
       # 6. Subir resultados como artifact
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: django-test-results
+          name: django-pytest-results
           path: results/results..txt
