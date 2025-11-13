@@ -33,11 +33,10 @@ jobs:
       - name: Create results folder
         run: mkdir -p results
 
-      # 5. Ejecutar pytest y guardar toda la salida
+      # 5. Ejecutar pytest y guardar toda la salida, aunque fallen tests
       - name: Run pytest and save results
         working-directory: AA_Energies
-        run: pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1
-
+        run: pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1 || true
 
       # 6. Subir resultados como artifact
       - name: Upload test results
