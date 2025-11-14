@@ -57,7 +57,7 @@ jobs:
 
       # 5. Run Django migrations
       - name: Run Django migrations
-        run: python manage.py migrate --noinput
+        run: python AAEnergies/manage.py migrate --noinput
 
       # 6. Create results folder
       - name: Create results folder
@@ -67,7 +67,7 @@ jobs:
       - name: Verify Django setup
         run: |
           echo "=== Django Check ==="
-          python manage.py check
+          python AAEnergies/manage.py check
           echo "=== Pytest Collection Dry Run ==="
           pytest AAEnergiesApp/tests/ --collect-only --ds=AAEnergiesite.settings || true
 
@@ -76,7 +76,7 @@ jobs:
         continue-on-error: true
         run: |
           pytest AAEnergiesApp/tests/ \
-            --ds=AAEnergiesite.settings \
+            --ds=AAEnergiessite/settings.py \
             --tb=short \
             --maxfail=5 \
             -v \
