@@ -20,25 +20,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const seasonSelect = document.getElementById('season-select');
   const dashboardPopup = document.getElementById('dashboardSettingsPopup');
   const closeDashboardSettings = document.getElementById('closeDashboardSettings');
-  const adminSection = document.getElementById('adminStatsSection'); // 👈 añadido
 
   console.log('btnLogout encontrado:', !!btnLogout);
 
   // ===============================
   // MOSTRAR SECCIÓN ADMIN (rol)
   // ===============================
-  const rol = localStorage.getItem('rol');
-  console.log('Rol detectado:', rol);
+const rol = localStorage.getItem('rol');
+const adminSection = document.getElementById('adminStatsSection');
+const chartCols = document.querySelectorAll('.chart-col');
 
-  if (adminSection) {
-    if (rol === 'admin') {
-      adminSection.style.display = 'block';
-      console.log('Sección admin visible');
-    } else {
-      adminSection.style.display = 'none';
-      console.log('Sección admin oculta');
-    }
+console.log('Rol detectado:', rol);
+
+if (adminSection) {
+  if (rol === 'admin') {
+    adminSection.style.display = 'block';
+    console.log('Sección admin visible');
+    // Mantener las columnas en col-lg-4 (3 columnas)
+    chartCols.forEach(col => {
+      col.classList.remove('col-lg-6');
+      col.classList.add('col-lg-4');
+    });
+  } else {
+    adminSection.style.display = 'none';
+    console.log('Sección admin oculta');
+    // Cambiar a col-lg-6 (2 columnas más grandes)
+    chartCols.forEach(col => {
+      col.classList.remove('col-lg-4');
+      col.classList.add('col-lg-6');
+    });
   }
+}
 
   // ===============================
   // FUNCIÓN PARA DETECTAR IDIOMA

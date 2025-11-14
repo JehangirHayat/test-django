@@ -12,6 +12,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DJANGO_SETTINGS_MODULE: AA_Energies.settings
+      SECRET_KEY: 'test-secret-key-for-ci'
+      DEBUG: 'False'
+
     steps:
       # 1. Checkout repository
       - name: Checkout code
@@ -23,24 +28,56 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3. Install dependencies
+      # 3. Cache pip dependencies
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('AA_Energies/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 4. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r AA_Energies/requirements.txt
+          pip install pytest pytest-django
 
-      # 4. Crear carpeta de resultados
+      # 5. Set up Django (migrations)
+      - name: Run Django migrations
+        working-directory: AA_Energies
+        run: |
+          python manage.py migrate --noinput
+
+      # 6. Create results folder
       - name: Create results folder
         run: mkdir -p results
 
-      # 5. Ejecutar pytest y guardar toda la salida, aunque fallen tests
-      - name: Run pytest and save results
+      # 7. Run pytest and save results
+      - name: Run pytest
         working-directory: AA_Energies
-        run: pytest AAEnergiesApp/tests/ --ds=AA_Energies.settings --tb=short --maxfail=5 > ../results/results..txt 2>&1 || true
+        continue-on-error: true
+        run: |
+          pytest AAEnergiesApp/tests/ \
+            --ds=AA_Energies.settings \
+            --tb=short \
+            --maxfail=5 \
+            -v \
+            --junitxml=../results/junit.xml \
+            | tee ../results/results.txt
 
-      # 6. Subir resultados como artifact
+      # 8. Upload test results
       - name: Upload test results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: django-pytest-results
-          path: results/results..txt
+          path: results/
+
+      # 9. Publish test results summary
+      - name: Publish test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: results/junit.xml

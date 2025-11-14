@@ -110,70 +110,71 @@
       </div>
 
       <!-- GRID PRINCIPAL -->
-      <div class="dashboard-grid container-fluid px-4">
-        <div class="row g-4">
-          <!-- ENERGIA -->
-          <div class="col-lg-4 col-md-6">
-            <section class="card card--chart h-100">
-              <h2 class="card__title">
-                <i class="fa-solid fa-bolt"></i> {% trans "Energía / kW" %}
-              </h2>
-              <div class="card__body">
-                <canvas id="energiaChartContainer"></canvas>
-              </div>
-            </section>
-          </div>
+<div class="dashboard-grid container-fluid px-4">
+  <div class="row g-4">
+    <!-- ENERGIA -->
+    <div class="col-lg-4 col-md-6 chart-col">
+      <section class="card card--chart h-100">
+        <h2 class="card__title">
+          <i class="fa-solid fa-bolt"></i> {% trans "Energía / kW" %}
+        </h2>
+        <div class="card__body">
+          <canvas id="energiaChartContainer"></canvas>
+        </div>
+      </section>
+    </div>
 
-          <!-- POTENCIA -->
-          <div class="col-lg-4 col-md-6">
-            <section class="card card--chart h-100">
-              <h2 class="card__title">
-                <i class="fa-solid fa-gauge-high"></i> {% trans "Potencia / kW" %}
-              </h2>
-              <div class="card__body">
-                <canvas id="potenciaChartContainer"></canvas>
-              </div>
-            </section>
-          </div>
+    <!-- POTENCIA -->
+    <div class="col-lg-4 col-md-6 chart-col">
+      <section class="card card--chart h-100">
+        <h2 class="card__title">
+          <i class="fa-solid fa-gauge-high"></i> {% trans "Potencia / kW" %}
+        </h2>
+        <div class="card__body">
+          <canvas id="potenciaChartContainer"></canvas>
+        </div>
+      </section>
+    </div>
 
-          <!-- EXPORT / IMPORT / HISTORY -->
-          <div class="col-lg-4 col-md-12" id="adminStatsSection" style="display: none;">
-            <section class="card card--info h-100">
-              <h2 class="card__title">
-                <i class="fa-solid fa-chart-line"></i> {% trans "Export / Import / History" %}
-              </h2>
-              <div class="card__body card__body--stats">
-                <div class="stat-item">
-                  <div class="stat-icon stat-icon--success">
-                    <i class="fa-solid fa-arrow-up"></i>
-                  </div>
-                  <div class="stat-content">
-                    <span class="stat-label">{% trans "Export" %}</span>
-                    <span class="stat-value">1,245 kW</span>
-                  </div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-icon stat-icon--warning">
-                    <i class="fa-solid fa-arrow-down"></i>
-                  </div>
-                  <div class="stat-content">
-                    <span class="stat-label">{% trans "Import" %}</span>
-                    <span class="stat-value">890 kW</span>
-                  </div>
-                </div>
-                <div class="stat-item">
-                  <div class="stat-icon stat-icon--info">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                  </div>
-                  <div class="stat-content">
-                    <span class="stat-label">{% trans "Historical" %}</span>
-                    <span class="stat-value">Ver datos</span>
-                  </div>
-                </div>
-              </div>
-            </section>
+    <!-- EXPORT / IMPORT / HISTORY -->
+    <div class="col-lg-4 col-md-12" id="adminStatsSection" style="display: none;">
+      <section class="card card--info h-100">
+        <h2 class="card__title">
+          <i class="fa-solid fa-chart-line"></i> {% trans "Export / Import / History" %}
+        </h2>
+        <div class="card__body card__body--stats">
+          <div class="stat-item">
+            <div class="stat-icon stat-icon--success">
+              <i class="fa-solid fa-arrow-up"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">{% trans "Export" %}</span>
+              <span class="stat-value">1,245 kW</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon stat-icon--warning">
+              <i class="fa-solid fa-arrow-down"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">{% trans "Import" %}</span>
+              <span class="stat-value">890 kW</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon stat-icon--info">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">{% trans "Historical" %}</span>
+              <span class="stat-value">Ver datos</span>
+            </div>
           </div>
         </div>
+      </section>
+    </div>
+  </div>
+</div>
 
         <!-- FILA INFERIOR -->
         <div class="row g-4 mt-4">
