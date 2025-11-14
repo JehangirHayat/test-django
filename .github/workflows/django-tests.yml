@@ -8,9 +8,8 @@ on:
     branches:
       - main
 
-permissions:          # ⬅ IMPORTANTE: necesario para crear Check Runs
-  contents: read
-  checks: write
+permissions:
+  contents: read      # checks: write eliminado porque ya no lo usas
 
 jobs:
   test:
@@ -87,26 +86,10 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/AA_Energies
 
-      - name: Upload test results
+      - name: Upload test results (artifact)
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: django-pytest-results
           path: results/
           if-no-files-found: warn
-
-      - name: Check if junit.xml exists
-        id: check_junit
-        if: always()
-        run: |
-          if [ -f results/junit.xml ]; then
-            echo "junit_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "junit_exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Publish test results
-        if: always() && steps.check_junit.outputs.junit_exists == 'true'
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: results/junit.xml
