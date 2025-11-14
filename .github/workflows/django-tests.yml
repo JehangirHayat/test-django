@@ -49,7 +49,7 @@ jobs:
         run: python manage.py migrate --noinput
         env:
           PYTHONPATH: ${{ github.workspace }}/AA_Energies
-          DJANGO_SETTINGS_MODULE: AAEnergiesite.settings
+          DJANGO_SETTINGS_MODULE: AAEnergiessite.settings
 
       # 6. Create pytest configuration
       - name: Create pytest.ini
@@ -57,7 +57,7 @@ jobs:
         run: |
           cat > pytest.ini << EOF
           [pytest]
-          DJANGO_SETTINGS_MODULE = AAEnergiesite.settings
+          DJANGO_SETTINGS_MODULE = AAEnergiessite.settings
           python_files = tests.py test_*.py *_tests.py
           pythonpath = .
           testpaths = AAEnergiesApp/tests
@@ -75,7 +75,7 @@ jobs:
           echo "=== Django Check ==="
           python manage.py check
           echo "=== Pytest Collection Dry Run ==="
-          pytest AAEnergiesApp/tests/ --collect-only --ds=AAEnergiesite.settings || true
+          pytest AAEnergiesApp/tests/ --collect-only --ds=AAEnergiessite.settings || true
         env:
           PYTHONPATH: ${{ github.workspace }}/AA_Energies
 
