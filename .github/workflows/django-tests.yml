@@ -21,14 +21,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 1.5 Debug - List files
-      - name: List repository contents
-        run: |
-          echo "=== Repository root contents ==="
-          ls -la
-          echo "=== Looking for requirements.txt ==="
-          find . -name "requirements.txt" -type f
-
       # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -40,7 +32,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('AAEnergiesApp/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('AA_Energies/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -48,42 +40,40 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          elif [ -f AAEnergiesApp/requirements.txt ]; then
-            pip install -r AAEnergiesApp/requirements.txt
-          fi
+          pip install -r AA_Energies/requirements.txt
           pip install pytest pytest-django
 
       # 5. Run Django migrations
       - name: Run Django migrations
-        run: python AAEnergies/manage.py migrate --noinput
+        working-directory: AA_Energies
+        run: python manage.py migrate --noinput
 
       # 6. Create results folder
       - name: Create results folder
         run: mkdir -p results
 
-      # 6.5. Debug - Check Django setup
+      # 7. Verify Django setup
       - name: Verify Django setup
+        working-directory: AA_Energies
         run: |
           echo "=== Django Check ==="
-          python AAEnergies/manage.py check
+          python manage.py check
           echo "=== Pytest Collection Dry Run ==="
           pytest AAEnergiesApp/tests/ --collect-only --ds=AAEnergiesite.settings || true
 
-      # 7. Run pytest and save results
+      # 8. Run pytest and save results
       - name: Run pytest
+        working-directory: AA_Energies
         continue-on-error: true
         run: |
           pytest AAEnergiesApp/tests/ \
-            --ds=AAEnergiessite/settings.py \
+            --ds=AAEnergiesite.settings \
             --tb=short \
             --maxfail=5 \
             -v \
-            --junitxml=results/junit.xml 2>&1 | tee results/results.txt
-          echo "PYTEST_EXIT_CODE=${PIPESTATUS[0]}" >> $GITHUB_ENV
+            --junitxml=../results/junit.xml 2>&1 | tee ../results/results.txt
 
-      # 8. Upload test results
+      # 9. Upload test results
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -92,9 +82,10 @@ jobs:
           path: results/
           if-no-files-found: warn
 
-      # 9. Publish test results summary (only if junit.xml exists)
+      # 10. Check if junit.xml exists
       - name: Check if junit.xml exists
         id: check_junit
+        if: always()
         run: |
           if [ -f results/junit.xml ]; then
             echo "junit_exists=true" >> $GITHUB_OUTPUT
@@ -102,8 +93,9 @@ jobs:
             echo "junit_exists=false" >> $GITHUB_OUTPUT
           fi
 
+      # 11. Publish test results summary (only if junit.xml exists)
       - name: Publish test results
-        if: steps.check_junit.outputs.junit_exists == 'true'
+        if: always() && steps.check_junit.outputs.junit_exists == 'true'
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: results/junit.xml
