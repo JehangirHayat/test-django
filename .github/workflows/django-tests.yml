@@ -47,6 +47,8 @@ jobs:
       - name: Run Django migrations
         working-directory: AA_Energies
         run: python manage.py migrate --noinput
+        env:
+          PYTHONPATH: ${{ github.workspace }}/AA_Energies
 
       # 6. Create results folder
       - name: Create results folder
@@ -60,6 +62,8 @@ jobs:
           python manage.py check
           echo "=== Pytest Collection Dry Run ==="
           pytest AAEnergiesApp/tests/ --collect-only --ds=AAEnergiesite.settings || true
+        env:
+          PYTHONPATH: ${{ github.workspace }}/AA_Energies
 
       # 8. Run pytest and save results
       - name: Run pytest
@@ -72,6 +76,8 @@ jobs:
             --maxfail=5 \
             -v \
             --junitxml=../results/junit.xml 2>&1 | tee ../results/results.txt
+        env:
+          PYTHONPATH: ${{ github.workspace }}/AA_Energies
 
       # 9. Upload test results
       - name: Upload test results
