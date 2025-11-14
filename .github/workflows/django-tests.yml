@@ -49,8 +49,22 @@ jobs:
         run: python manage.py migrate --noinput
         env:
           PYTHONPATH: ${{ github.workspace }}/AA_Energies
+          DJANGO_SETTINGS_MODULE: AAEnergiesite.settings
 
-      # 6. Create results folder
+      # 6. Create pytest configuration
+      - name: Create pytest.ini
+        working-directory: AA_Energies
+        run: |
+          cat > pytest.ini << EOF
+          [pytest]
+          DJANGO_SETTINGS_MODULE = AAEnergiesite.settings
+          python_files = tests.py test_*.py *_tests.py
+          pythonpath = .
+          testpaths = AAEnergiesApp/tests
+          EOF
+          cat pytest.ini
+
+      # 7. Create results folder
       - name: Create results folder
         run: mkdir -p results
 
